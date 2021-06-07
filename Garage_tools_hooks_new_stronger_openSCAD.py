@@ -9,12 +9,13 @@ boxInnerYmax = 27
 boxInnerXmax = 27
 boxInnerXmin = 0
 boxInnerYmin = 0
+overhang = boxInnerXmax/8  # to make it an obtuse angle
 thk = 0
 wall_thickness = 3
 zzz = polygon(points=[
     [boxInnerXmin-thk,boxInnerYmin-thk],
     [boxInnerXmax+thk,boxInnerYmin-thk],
-    [boxInnerXmin+thk,boxInnerYmax+thk],
+    [boxInnerXmin+thk-overhang,boxInnerYmax+thk],
     [boxInnerXmin-thk,boxInnerYmin-thk]
     ])
 zzz = linear_extrude(wall_thickness)(zzz)
@@ -24,7 +25,7 @@ hollow_thk = 3
 hollow_space = polygon(points=[
     [boxInnerXmin + hollow_thk,boxInnerYmin + hollow_thk],
     [boxInnerXmax-hollow_thk*2*2**.5,boxInnerYmin + hollow_thk],
-    [boxInnerXmin + hollow_thk,boxInnerYmax-hollow_thk*2*2**.5],
+    [boxInnerXmin + hollow_thk - overhang*.7,boxInnerYmax-hollow_thk*2*2**.5],
     [boxInnerXmin + hollow_thk,boxInnerYmin + hollow_thk],
     ])
 hollow_space = linear_extrude(wall_thickness)(hollow_space)
@@ -36,7 +37,7 @@ zzz = up(spacing/2)(zzz)
 
 #add the part that rests on the wall, interfacing with the screw
 thk_off_wall = hollow_thk
-box_x_min = 0
+box_x_min = -1
 box_x_inner_min = box_x_min + hollow_thk
 box_x_max = boxInnerXmax
 box_x_inner_max = box_x_max - hollow_thk
@@ -59,7 +60,19 @@ screw_interface = forward(thk_off_wall)(rotate([90,0,0])(screw_interface))
 zzz += screw_interface
 
 #Reinforcement piece
-zzz += forward(7)(resize([1,2,spacing/2])(cube()))
+zzz += left(3)(forward(7)(resize([5,2,spacing/2])(cube())))
+
+#flattening cutting peice
+fcp = polygon(points=[
+    [boxInnerXmin,boxInnerYmin],
+    [-boxInnerXmax,boxInnerYmin],
+    [boxInnerXmin-overhang,boxInnerYmax],
+    [boxInnerXmin,boxInnerYmin]
+    ])
+fcp = linear_extrude(20)(fcp)
+zzz -= fcp
+
+#mirror symmetry
 zzz += mirror([0,0,1])(zzz)
 
 
