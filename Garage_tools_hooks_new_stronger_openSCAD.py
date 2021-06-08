@@ -11,7 +11,7 @@ boxInnerXmin = 0
 boxInnerYmin = 0
 overhang = boxInnerXmax/8  # to make it an obtuse angle
 thk = 0
-wall_thickness = 3
+wall_thickness = 5
 zzz = polygon(points=[
     [boxInnerXmin-thk,boxInnerYmin-thk],
     [boxInnerXmax+thk,boxInnerYmin-thk],
@@ -22,6 +22,7 @@ zzz = linear_extrude(wall_thickness)(zzz)
 
 #now cut out the hollow space
 hollow_thk = 3
+'''
 hollow_space = polygon(points=[
     [boxInnerXmin + hollow_thk,boxInnerYmin + hollow_thk],
     [boxInnerXmax-hollow_thk*2*2**.5,boxInnerYmin + hollow_thk],
@@ -30,7 +31,7 @@ hollow_space = polygon(points=[
     ])
 hollow_space = linear_extrude(wall_thickness)(hollow_space)
 zzz -= hollow_space
-
+'''
 
 spacing = 10
 zzz = up(spacing/2)(zzz)
@@ -75,6 +76,7 @@ zzz -= fcp
 #mirror symmetry
 zzz += mirror([0,0,1])(zzz)
 
+zzz = rotate([90,0,0])(zzz)
 
 to_print = zzz
 
