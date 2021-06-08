@@ -12,13 +12,15 @@ boxInnerYmin = 0
 overhang = boxInnerXmax/8  # to make it an obtuse angle
 thk = 0
 wall_thickness = 5
-zzz = polygon(points=[
+main_triangle_points = [
     [boxInnerXmin-thk,boxInnerYmin-thk],
     [boxInnerXmax+thk,boxInnerYmin-thk],
     [boxInnerXmin+thk-overhang,boxInnerYmax+thk],
     [boxInnerXmin-thk,boxInnerYmin-thk]
-    ])
+    ]
+zzz = polygon(points=main_triangle_points)
 zzz = linear_extrude(wall_thickness)(zzz)
+
 
 #now cut out the hollow space
 hollow_thk = 3
@@ -72,6 +74,21 @@ fcp = polygon(points=[
     ])
 fcp = linear_extrude(20)(fcp)
 zzz -= fcp
+
+#round the tip a bit
+tipx, tipy = main_triangle_points[2][0],main_triangle_points[2][1]
+print(tipx, tipy)
+tip_rounding_feature = polygon(points=[
+    [tipx,tipy],
+    [tipx-2,tipy],
+    [tipx-2.5,tipy-.5],
+    [tipx-2.5,tipy-2],
+    [tipx+1,tipy-5],
+    [tipx,tipy]
+    ])
+tip_rounding_feature = up(spacing/2)(linear_extrude(wall_thickness)(tip_rounding_feature))
+zzz += tip_rounding_feature
+
 
 #mirror symmetry
 zzz += mirror([0,0,1])(zzz)
