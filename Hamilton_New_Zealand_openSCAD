@@ -1,0 +1,134 @@
+#Hamilton_New_Zealand_openSCAD.py
+from solid import *
+from solid.utils import *  # Not required, but the utils module is useful
+import pyperclip
+from io import StringIO
+import pandas as pd 
+
+'''#############################################################################
+#############################################################################
+
+first points for main shape and spire, traced from frontal image
+
+#############################################################################
+################################################################################'''
+
+front_left_half_points = '''index	Area	Mean	Min	Max	X	Y	label
+1	0	59	59	59	322	831.375	bottom_left
+2	0	196	196	196	322	763.047	height_of_first_level
+3	0	169	169	169	426.458	761.737	height_main_body
+4	0	28	28	28	426.458	575.625	main_body_bevel_left
+5	0	185	185	185	432.500	575.625	main_body_bevel_in
+6	0	53	53	53	432.500	568.438	main_body_bevel_top
+7	0	166	166	166	524.167	568.438	base_of_first_spire
+8	0	166	166	166	524.167	453.500	top_out_of_first_spire
+9	0	174	174	174	539.500	453.500	bottom_second_spire
+10	0	199	199	199	539.500	361.500	top_second_spire
+11	0	245	245	245	546.375	361.500	first_bez_second_spire_in
+12	0	172	172	172	546.375	353.500	first_bez_second_spire_out
+13	0	165	165	165	553.625	353.500	2nd_bez_second_spire_in
+14	0	39	39	39	553.625	340.375	2nd_bez_second_spire_out
+15	0	34	34	34	559.375	340.375	third_spire_bot
+16	0	37	37	37	559.375	221.500	third_spire_top
+17	0	37	37	37	558.625	221.500	
+18	0	205	205	205	558.625	220.625	
+19	0	52	52	52	561.125	220.375	
+20	0	31	31	31	561.125	216.750	
+21	0	27	27	27	559.500	216.625	
+22	0	80	80	80	559.500	214.875	
+23	0	75	75	75	563.625	214.375	
+24	0	86	86	86	563.625	209.625	
+25	0	50	50	50	561.750	209.500	
+26	0	80	80	80	561.750	208.875	
+27	0	94	94	94	565.250	208.500	
+28	0	79	79	79	565.250	202.500	
+29	0	33	33	33	563.625	202.500	
+30	0	102	102	102	563.625	201.625	
+31	0	66	66	66	567.500	201.625	
+32	0	27	27	27	567.500	196.562	
+33	0	49	49	49	564.500	196.500	
+34	0	111	111	111	564.500	194.500	
+35	0	31	31	31	569.438	194.469	
+36	0	41	41	41	569.438	104.531	tallest_spire_out
+37	0	75	75	75	569.969	104.531	tallest_spire_in
+38	0	46	46	46	569.969	831.375	
+'''
+
+text_file = open("temp.txt", "w+")
+n = text_file.write(front_left_half_points)
+text_file.close()
+
+df = pd.read_csv("temp.txt", sep='\t')
+#print(df)
+
+
+df['Xn'] = df['X']-df['X'].max()
+df['Yn'] = df['Y']-df['Y'].max()
+
+scale = 1
+df['Xnl'] = df['Xn']*scale
+df['Ynl'] = df['Yn']*scale
+
+ll = df[['Xnl','Ynl']].values.tolist()
+
+length = 1000
+
+to_print = polygon(ll)
+to_print = linear_extrude(length)(to_print)
+#to_print = mirror([1,0,0])(to_print) + to_print
+
+to_print2 = polygon(ll)
+to_print2 = linear_extrude(length*2)(to_print2)
+to_print2 = left(length/2)(rotate([0,90,0])(to_print2))
+to_print = intersection()(to_print,to_print2)
+to_print += mirror([0,0,1])(to_print)
+to_print += mirror([1,0,0])(to_print)
+
+
+'''#############################################################################
+#############################################################################
+
+second side, guessed from shape
+
+#############################################################################
+################################################################################'''
+side_points = '''index	Area	Mean	Min	Max	X	Y	label
+1	0	59	59	59	322	831.375	bottom_left
+2	0	196	196	196	322	763.047	height_of_first_level
+3	0	169	169	169	426.458	761.737	height_main_body
+4	0	28	28	28	426.458	575.625	main_body_bevel_left
+5	0	185	185	185	432.500	575.625	main_body_bevel_in
+6	0	53	53	53	432.500	568.438	main_body_bevel_top
+7	0	166	166	166	524.167	568.438	base_of_first_spire
+38	0	46	46	46	569.969	831.375	
+'''
+
+text_file = open("temp.txt", "w+")
+n = text_file.write(side_points)
+text_file.close()
+
+df = pd.read_csv("temp.txt", sep='\t')
+#print(df)
+
+
+df['Xn'] = df['X']-df['X'].max()
+df['Yn'] = df['Y']-df['Y'].max()
+
+scale = 1
+df['Xnl'] = df['Xn']*scale
+df['Ynl'] = df['Yn']*scale
+
+ll = df[['Xnl','Ynl']].values.tolist()
+
+length = 1500
+
+to_print3 = polygon(ll)
+to_print3 = linear_extrude(length)(to_print3)
+to_print+=to_print3
+
+printstring = '$fn=100;\n' + scad_render(to_print)
+pyperclip.copy(printstring)
+
+print("the following has been copied")
+print(scad_render(to_print))
+print()
