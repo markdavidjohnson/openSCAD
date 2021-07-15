@@ -29,13 +29,27 @@ to_print=parts[0]
 for i,item in enumerate(parts):
     to_print += right(item[1])(item[0])
 
+#INCHES
 rolly = 17.7
-rollx = 118.1  # 196.9, 314.9
+rollx_small = 118.1  # 196.9, 314.9
 #rollx = 196.9  # 196.9, 314.9
-rollx, rolly = rollx*2.54,rolly*2.54
-roll = back(100)(up(random.random()*5)(resize([rollx,rolly,thk])(cube())))
-roll = color([0,0,255,255])(roll)
-to_print += roll
+#NOW CM
+rollx_small, rolly = rollx_small*2.54,rolly*2.54
+
+#piece 1
+roll_small = down(5)(back(0)(up(random.random()*5)(resize([rollx_small,rolly,thk])(cube()))))
+roll_small = color([0,0,255,255])(roll_small)
+to_print += roll_small
+
+#piece 2
+roll_small = right(rollx_small)(down(5)(back(0)(up(random.random()*5)(resize([rollx_small,rolly,thk])(cube())))))
+roll_small = color([random.random()*255,random.random()*255,random.random()*255,255])(roll_small)
+to_print += roll_small
+
+#piece 3
+roll_small = right(0)(down(5)(forward(rolly)(up(random.random()*5)(resize([rollx_small,rolly,thk])(cube())))))
+roll_small = color([random.random()*255,random.random()*255,random.random()*255,255])(roll_small)
+to_print += roll_small
 
 to_print += color([255,0,0,255])(right(329)(resize([2,100,thk])(cube())))
 
