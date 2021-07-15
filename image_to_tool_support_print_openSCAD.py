@@ -11,14 +11,14 @@ from io import StringIO
 import pandas as pd 
 
 # reading image
-path = 'IMG_6592.jpg'
+path = 'IMG_6595.jpg'
 img = cv2.imread(path)
 x=400
 w=2300
 y=1400
 h=1000
 
-img = img[y:y+h, x:x+w]
+#img = img[y:y+h, x:x+w]
 
 # converting image into grayscale image
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
