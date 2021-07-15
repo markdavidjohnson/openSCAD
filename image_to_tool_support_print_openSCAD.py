@@ -20,17 +20,17 @@ import pyperclip
 from io import StringIO
 import pandas as pd 
 
-# reading image
-path = '/Users/MarkJohnson/Downloads/IMG_6600.jpg'
-screen_path = "/Users/MarkJohnson/Downloads/screen.csv"
-use_last_identified_contour = True  # True or False
+#general settings
+image_path = '/Users/MarkJohnson/Downloads/IMG_6596.jpg'
+use_last_identified_contour = False  # True or False
 last_identified_contour_path = "image_to_tool_support_print_openSCAD_last_identified_contour.csv"
-tool_outline_extrude_length = .5
-use_subtraction_object = True
+tool_outline_extrude_distance = .5
+#subtraction object settings
+use_subtraction_object = False
+use_subtraction_object_path = "/Users/MarkJohnson/Downloads/screen.csv"
 
 if not use_last_identified_contour:
-    img = cv2.imread(path)
-
+    img = cv2.imread(image_path)
     '''
     # optional cropping step
     x=400
@@ -218,14 +218,14 @@ else:  # if not using a new image to determine the points
     output_points = pd.read_csv(last_identified_contour_path).values.tolist()
 
 
-main_tool_outline = linear_extrude(tool_outline_extrude_length)(polygon(output_points))
+main_tool_outline = linear_extrude(tool_outline_extrude_distance)(polygon(output_points))
 
 
 
 if use_subtraction_object:
 
     #add my FIJI trace of the screen for cutting out of the tool contour
-    df = pd.read_csv(screen_path, sep=',')
+    df = pd.read_csv(use_subtraction_object_path, sep=',')
 
     df['Xn'] = df['X']-df['X'].min()
     df['Yn'] = df['Y']-df['Y'].min()
