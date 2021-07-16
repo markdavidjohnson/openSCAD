@@ -6,8 +6,13 @@ Take a picture of a tool with a white background, and a standard cheap plastic r
 Try to minimize distortion, and put the camera 1 meter above the subject, cropping down to 
 have only the tool, ruler, and white background.
 
-Then update the paths and run. It will scale using the ruler, automatically identifying it if
-you've taken the picture from the correct distance (and your phone's resolution matches my iphone 8)
+Then update the paths and run. It will ask you which outlines is the ruler for scaling purposes
+and which one is the tool you want to create a shadow for.
+
+The best method by far, if you can, is to put a computer screen on a table, protect it with 
+parchment paper or some other translucent material (also important for eliminating pixel lines)
+and putting the tools (gently) on the screen. In a dark room, this eliminates the shadows that
+otherwise could mess up your outline.
 '''
 import cv2
 import numpy as np
@@ -20,14 +25,19 @@ import pyperclip
 from io import StringIO
 import pandas as pd 
 
+import webbrowser
+
+
+
 #general settings
-image_path = '/Users/MarkJohnson/Downloads/IMG_6596.jpg'
+image_path = '/Users/MarkJohnson/Downloads/IMG_6611.jpg'
 use_last_identified_contour = False  # True or False
 last_identified_contour_path = "image_to_tool_support_print_openSCAD_last_identified_contour.csv"
 tool_outline_extrude_distance = .5
 #subtraction object settings
 use_subtraction_object = False
 use_subtraction_object_path = "/Users/MarkJohnson/Downloads/screen.csv"
+expected_ruler_area = 9300  # units: mm^2
 
 if not use_last_identified_contour:
     img = cv2.imread(image_path)
@@ -43,33 +53,6 @@ if not use_last_identified_contour:
     # converting image into grayscale image
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    #finding yellows and other light colors and making them look dark by setting the gray value to the darkest rgb value
-    rows,cols,depth = img.shape
-    i=0
-    while i < rows:
-        if i % 20 ==0:
-            print('non-grays, row:',i,'of',rows)
-        j = 0
-        row_had_color = False
-        while j < cols:
-            k = img[i,j]
-            min = np.amin(k)
-            max = np.amax(k)
-            if min < max*.7:
-                gray[i,j] = 0  #min  # darkening the pixels that are not gray
-                row_has_color = True
-                #j += 1
-            else:
-                j += 10
-            j += 1
-        i += 1
-        if not row_had_color:
-            i += 0
-
-
-
-
-
     # setting threshold of gray image
     _, threshold = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
@@ -80,9 +63,9 @@ if not use_last_identified_contour:
     height = int(img.shape[0] * scale_percent / 100)
     dim = (width, height)
     gray = cv2.resize(gray, dim, interpolation = cv2.INTER_AREA)
-    cv2.imshow('shapes', gray)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2.imshow('shapes gray', gray)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 
 
 
@@ -92,16 +75,15 @@ if not use_last_identified_contour:
     contours, _ = cv2.findContours(
         threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    i = 0
+    i = -1
     areas = []
     rulermsg = ''
     # list for storing names of shapes
     for contour in contours:
-
+        i += 1
         # here we are ignoring first counter because
         # findcontour function detects whole image as shape
         if i == 0:
-            i = 1
             continue
 
         # cv2.approxPloyDP() function to approximate the shape
@@ -110,21 +92,11 @@ if not use_last_identified_contour:
         
         #PRINT AREA
         area = cv2.contourArea(contour)
-        if area > 9*10**5 or area < 1*10**5:  # caution, this will cause a max and min regonized size
+        if area>100000:
+            print("area of detected large shapes:",area)
+        if area > 12*10**5 or area < .1*10**5:  # caution, this will cause a max and min regonized size
             continue
         else:
-            ruler_recognition_size_tolerance = .3
-            if area > 500000* (1-ruler_recognition_size_tolerance) and area < 500000* (1+ruler_recognition_size_tolerance):  # IS RULER
-                linear_calibration_factor = (area/9300)**.5
-                if rulermsg == '':
-                    rulermsg = 'ruler area og ' + str(area) + '\linear_calibration_factor ' + str(linear_calibration_factor)
-                else:
-                    print('error, multiple ruler messages')
-                    exit()
-            else:
-                areas.append(area)
-                tool_contour = contour
-
             # using drawContours() function
             cv2.drawContours(img, [contour], 0, (0, 0, 255), 5)
 
@@ -137,25 +109,9 @@ if not use_last_identified_contour:
                 y = int(M['m01']/M['m00'])
 
             # putting shape name at center of each shape
-            if len(approx) == 3:
-                cv2.putText(img, 'Triangle', (x, y),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            cv2.putText(img, str(i), (x, y),
+                            cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 255), 2)
 
-            elif len(approx) == 4:
-                cv2.putText(img, 'Quadrilateral', (x, y),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-
-            elif len(approx) == 5:
-                cv2.putText(img, 'Pentagon', (x, y),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-
-            elif len(approx) == 6:
-                cv2.putText(img, 'Hexagon', (x, y),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
-
-            else:
-                cv2.putText(img, 'circle', (x, y),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
     scale_percent = 30 # percent of original size
     width = int(img.shape[1] * scale_percent / 100)
@@ -163,7 +119,23 @@ if not use_last_identified_contour:
     dim = (width, height)
     resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
     # displaying the image after drawing contours
-    cv2.imshow('shapes', resized)
+    #cv2.imshow('shapes contours, which is ruler and tool?', resized)
+    intermediate_out_path = 'which_contour.png'
+    cv2.imwrite(intermediate_out_path,img)  
+    webbrowser.get('macosx').open(intermediate_out_path)
+
+
+    print('check ' + intermediate_out_path)
+    index_of_ruler = int(input('which number was the ruler?'))
+    index_of_tool = int(input('which number was the tool?'))
+    tool_contour = contours[index_of_tool]
+
+    ruler_contour = contours[index_of_ruler]
+    ruler_area = cv2.contourArea(ruler_contour)
+    linear_calibration_factor = (ruler_area/expected_ruler_area)**.5
+
+    areas.append(tool_contour)
+    #areas.append(ruler_contour)
 
     print()
     print('areas')
@@ -177,8 +149,7 @@ if not use_last_identified_contour:
         print('error: detected the wrong number of tools, len(areas)',len(areas),'areas:',areas)
         exit()
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    
     #print(tool_contour)
 
     #scale points to real size
@@ -200,15 +171,19 @@ if not use_last_identified_contour:
         output_points[i] = [newx,newy]
     #clean up points (trying to eliminate self-intersecting meshes that won't render in openscad https://github.com/openscad/openscad/issues/791)
     for i, item in enumerate(output_points):
-        newx = round(item[0],0)
-        newy = round(item[1],0)
+        if use_subtraction_object:
+            round_digits = 0
+        else:
+            round_digits = 8
+        newx = round(item[0],round_digits)
+        newy = round(item[1],round_digits)
         output_points[i] = [newx,newy]
 
-    mask = np.ones(img.shape, dtype=np.uint8) * 255
-    cv2.drawContours(mask, [tool_contour], -1, (0,0,0), thickness=10)
-    cv2.imshow('shapes', mask)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #mask = np.ones(img.shape, dtype=np.uint8) * 255
+    #cv2.drawContours(mask, [tool_contour], -1, (0,0,0), thickness=10)
+    #cv2.imshow('shapes', mask)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
     
     dfo = pd.DataFrame(output_points,columns=["X","Y"])
     dfo.to_csv(last_identified_contour_path,index=False)
@@ -219,6 +194,7 @@ else:  # if not using a new image to determine the points
 
 
 main_tool_outline = linear_extrude(tool_outline_extrude_distance)(polygon(output_points))
+main_tool_outline = mirror([0,1,0])(main_tool_outline)
 
 
 
