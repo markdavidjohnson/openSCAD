@@ -1,0 +1,20 @@
+INDEX,full_width,gripper_length_without_screw_space,gripper_center_wall_offset,base_height,gripper_height,gripper_type,old_gripper_length,1_for_print,note
+1,14,10,2,10,10,straight,15,0,agetor adjustable wrench
+2,15,10,2,10,10,straight,18,0,non-agetor adjustable wrench
+3,43,16,2,10,10,curved,16,0,pittsburgh needlenose pliers
+4,23,20,21,10,10,curved,20,0,hugest flathead 
+5,8,20,18,10,10,straight,20,0,parktool allen wrench
+6,20,27,20,10,10,curved,27,0,mintcraft driver bit screwdriver
+7,48,20,2,10,10,straight,20,0,pittsburgh linesman pliers
+8,50,16,2,10,10,straight,16,0,pittsburgh wire cutters
+9,39,15,2,10,10,straight,15,0,velochampion allen wrench set
+10,72,23,2,10,10,straight,23,0,jst crimper
+11,22,17,2,10,10,straight,17,1,scissors
+12,17,15,15,10,9,curved,15,1,long narrow phillips
+13,20,19,18,10,5,curved,24,1,short stubby phllips
+14,16.5,16,16,10,9,curved,16,1,short narrow flathead
+15,16,13,13,10,8,curved,13,1,medium screw capture flathead
+16,,,2,10,10,,,0,blow gun
+17,20,18,18,10,10,curved,18,1,normal flat head
+18,20,18,18,10,10,curved,18,1,just shy of normal flathead
+19,20,14,2,10,10,straight,14,0,hole punch
