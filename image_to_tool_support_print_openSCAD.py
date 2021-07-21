@@ -13,9 +13,6 @@ The best method by far, if you can, is to put a computer screen on a table, prot
 parchment paper or some other translucent material (also important for eliminating pixel lines)
 and putting the tools (gently) on the screen. In a dark room, this eliminates the shadows that
 otherwise could mess up your outline.
-
-you also need to have a csv file with settings if you want to use this new bulk version, you can 
-see an example of the file in this github
 '''
 import cv2
 import numpy as np
