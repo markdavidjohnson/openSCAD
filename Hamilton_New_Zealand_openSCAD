@@ -69,6 +69,10 @@ scale = 1
 df['Xnl'] = df['Xn']*scale
 df['Ynl'] = df['Yn']*scale
 
+roof_height = df[df.label == 'base_of_first_spire']['Yn'].tolist()[0]
+roof_width = df[df.label == 'base_of_first_spire']['Xn'].tolist()[0]
+
+
 ll = df[['Xnl','Ynl']].values.tolist()
 
 length = 1000
@@ -82,7 +86,8 @@ to_print2 = linear_extrude(length*2)(to_print2)
 to_print2 = left(length/2)(rotate([0,90,0])(to_print2))
 to_print = intersection()(to_print,to_print2)
 to_print += mirror([0,0,1])(to_print)
-to_print += mirror([1,0,0])(to_print)
+#to_print += mirror([1,0,0])(to_print)
+
 
 
 '''#############################################################################
@@ -92,6 +97,8 @@ second side, guessed from shape
 
 #############################################################################
 ################################################################################'''
+
+
 side_points = '''index	Area	Mean	Min	Max	X	Y	label
 1	0	59	59	59	322	831.375	bottom_left
 2	0	196	196	196	322	763.047	height_of_first_level
@@ -107,24 +114,36 @@ text_file = open("temp.txt", "w+")
 n = text_file.write(side_points)
 text_file.close()
 
-df = pd.read_csv("temp.txt", sep='\t')
+dfs = pd.read_csv("temp.txt", sep='\t')
 #print(df)
 
 
-df['Xn'] = df['X']-df['X'].max()
-df['Yn'] = df['Y']-df['Y'].max()
+dfs['Xn'] = dfs['X']-dfs['X'].max()
+dfs['Yn'] = dfs['Y']-dfs['Y'].max()
 
 scale = 1
-df['Xnl'] = df['Xn']*scale
-df['Ynl'] = df['Yn']*scale
+dfs['Xnl'] = dfs['Xn']*scale
+dfs['Ynl'] = dfs['Yn']*scale
 
-ll = df[['Xnl','Ynl']].values.tolist()
+ll = dfs[['Xnl','Ynl']].values.tolist()
 
-length = 1500
+length = 600
 
 to_print3 = polygon(ll)
 to_print3 = linear_extrude(length)(to_print3)
 to_print+=to_print3
+
+
+
+
+divot_fill_width = 100
+divot_fill = resize([divot_fill_width,-roof_height,length])(cube())
+divot_fill = left(divot_fill_width)(forward(roof_height)(divot_fill))
+
+to_print += divot_fill
+
+
+to_print += mirror([1,0,0])(to_print)
 
 printstring = '$fn=100;\n' + scad_render(to_print)
 pyperclip.copy(printstring)
@@ -132,3 +151,6 @@ pyperclip.copy(printstring)
 print("the following has been copied")
 print(scad_render(to_print))
 print()
+
+print()
+print(roof_width,roof_height)
