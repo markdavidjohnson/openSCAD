@@ -7,18 +7,9 @@ import pyperclip
 from io import StringIO
 import pandas as pd 
 
-'''
-I use this script to create batches of parametrically defined tool hooks. It 
-outputs the hooks as openSCAD code in a compact arrangement fit for a 200x200mm 
-printer.
-
-see an example of the file in this github titled garage_hook_generator_settings
-for an example on how to build your own csv settings file.
-'''
-
 path = '/Users/MarkJohnson/Downloads/garage_hook_generator_settings - Sheet1.csv'
 path = '/Users/MarkJohnson/Downloads/garage_hook_generator_settings - Sheet1 (1).csv'
-path = '/Users/MarkJohnson/Downloads/garage_hook_generator_settings - Sheet1 (5).csv'
+path = '/Users/MarkJohnson/Downloads/garage_hook_generator_settings - Sheet1 (6).csv'
 #df = read_csv(path).loc[3,14]
 df = pd.read_csv(path)
 output_shapes = []
@@ -39,6 +30,7 @@ for i,row in df.iterrows():
         continue
     halft_width = row.full_width/2 #53.5/2  #59.5/2 #35/2 #38/2 #31.5/2
     thk = max(1.6,halft_width / ((31.5/2) / 1.2))  # i like this ratio to the overall size, but feel free to modify
+    #thk = thk*2  # for thicc
     gripper_type = row.gripper_type# 'straight'  # 'curved' or 'straight'
     #only used for gripper_type = 'straight'
     gripper_length = row.gripper_length_without_screw_space + 3
@@ -72,7 +64,7 @@ for i,row in df.iterrows():
     else:
         print('no gripper_type recognized, please edit the variable assignment')
 
-    screw_hole_radius = 1.5
+    screw_hole_radius = 2
     screw_hole = cylinder(r=screw_hole_radius,h=base_height)
     screw_hole = rotate([90,0,0])(screw_hole)
     screw_hole = up(base_height/2)(screw_hole)
@@ -96,7 +88,7 @@ for i,item in enumerate(output_shapes):
         new_half_width = output_shapes[i][1]
         max_gripper_length = max(max_gripper_length,output_shapes[i][2])
         new_offset = old_half_width + new_half_width
-        xloc += new_offset + 6
+        xloc += new_offset + 15
         print(i,'new_offset',xloc)
         if xloc + new_half_width + 4 > 200:
             print('we over 200',xloc,yloc)
