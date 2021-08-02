@@ -13,6 +13,9 @@ The best method by far, if you can, is to put a computer screen on a table, prot
 parchment paper or some other translucent material (also important for eliminating pixel lines)
 and putting the tools (gently) on the screen. In a dark room, this eliminates the shadows that
 otherwise could mess up your outline.
+
+you also need to have a csv file with settings if you want to use this new bulk version, you can 
+see an example of the file in this github
 '''
 import cv2
 import numpy as np
@@ -31,15 +34,18 @@ import random
 
 
 #general settings
-image_path = '/Users/MarkJohnson/Downloads/IMG_6639.jpg'
-use_last_identified_contours = True  # True or False
+image_path = '/Users/MarkJohnson/Downloads/IMG_6671.jpg'
+use_last_identified_contours = False  # True or False
 last_identified_contour_path = "image_to_tool_support_print_openSCAD_last_identified_contour.csv"
 tool_outline_extrude_distance = .5
 #subtraction object settings
-use_subtraction_objects = False
+use_subtraction_objects = True
 expected_ruler_area = 9300  # units: mm^2
 #setting for light color slow mode
-use_light_color_mode = True
+use_light_color_mode = False
+max_area = 12*10**5
+min_area = .1*10**5
+min_area = .01*10**5
 
 
 #creating the path to save out identified contours for faster processing in light color slow mode
@@ -129,7 +135,7 @@ for contour in contours:
     area = cv2.contourArea(contour)
     if area>100000:
         print("area of detected large shapes:",area)
-    if area > 12*10**5 or area < .1*10**5:  # caution, this will cause a max and min regonized size
+    if area > max_area or area < min_area:  # caution, this will cause a max and min regonized size
         continue
     else:
         # using drawContours() function
