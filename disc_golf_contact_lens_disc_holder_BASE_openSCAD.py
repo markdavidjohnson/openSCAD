@@ -1,4 +1,4 @@
-#disc_golf_contact_lens_disc_holder_openSCAD.py
+#disc_golf_contact_lens_disc_holder_BASE_openSCAD.py
 from numpy.lib.polynomial import poly
 from pandas.core import base
 from pandas.io.parsers import read_csv
@@ -94,7 +94,10 @@ rrt = sR__s + s__Bs                                            # right right top
 rlb = s_R_s + s__Ts + sRR__s                                   # right left bottom
 rlt = s_R_s + s__Bs + sRR__s                                   # right left top
 
-part = part - rlt  # use this line to select the section of the whole part to show eg: part = part - lrt
+part = color([1,1,1])(part)
+
+part = part# - rlt  # use this line to select the section of the whole part to show eg: part = part - lrt
+
 
 
 
@@ -103,7 +106,7 @@ part = part - rlt  # use this line to select the section of the whole part to sh
 
 to_print = part
 
-printstring = '$fn=300;\n' + scad_render(to_print)
+printstring = '$fn=30;\n' + scad_render(to_print)
 pyperclip.copy(printstring)
 
 #print("the following has been copied")
