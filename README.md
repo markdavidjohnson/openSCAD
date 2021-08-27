@@ -1,5 +1,4 @@
-# various 3d objects, written in python using openpyscad
-https://pypi.org/project/openpyscad/
+# various 3d objects, written in python using [openpyscad](https://pypi.org/project/openpyscad/)
 
 disc_golf_contact_lens_disc_holder_CAP_openSCAD.py
 ![image](https://user-images.githubusercontent.com/31580931/131172593-7499597a-54b2-4064-96d3-a29a36c723b2.png)
